@@ -35,16 +35,16 @@ if not Config.UseDeferrals then
 		if state == false then ClearTimecycleModifier() end
 	end
 
-	RegisterNetEvent('esx_identity:showRegisterIdentity')
-	AddEventHandler('esx_identity:showRegisterIdentity', function()
-		TriggerEvent('esx_skin:resetFirstSpawn')
+	-- RegisterNetEvent('esx_identity:showRegisterIdentity')
+	-- AddEventHandler('esx_identity:showRegisterIdentity', function()
+	-- 	TriggerEvent('esx_skin:resetFirstSpawn')
 
-		if not ESX.PlayerData.dead then
-			EnableGui(true)
-			SetTimecycleModifier("hud_def_blur")
-		SetTimecycleModifierStrength(1)
-		end
-	end)
+	-- 	if not ESX.PlayerData.dead then
+	-- 		EnableGui(true)
+	-- 		SetTimecycleModifier("hud_def_blur")
+	-- 	SetTimecycleModifierStrength(1)
+	-- 	end
+	-- end)
 
 
 	RegisterNUICallback('register', function(data, cb)
