@@ -2066,7 +2066,7 @@ if Config.EnableESXIdentityIntegration then
             preparingSkin = false
         end
         if not isDead then
-            TriggerEvent('cui_character:open', { 'identity', 'features', 'style', 'apparel' }, false)
+            -- TriggerEvent('cui_character:open', { 'identity', 'features', 'style', 'apparel' }, false)
         end
     end)
 
@@ -2087,7 +2087,7 @@ if Config.EnableESXIdentityIntegration then
                     newCharacter = false
                 end
             else
-                ESX.ShowNotification(_U('registration_error')) --TODO: Notification (or sound effect)
+               -- ESX.ShowNotification(_U('registration_error')) TODO: Notification (or sound effect)
             end
         end, data)
     end)
@@ -2100,8 +2100,10 @@ if Config.EnableESXIdentityIntegration then
                     TriggerEvent('esx_skin:playerRegistered')
                 end
             else
+                print("cuicharar2105")
                 --TODO: Notification (or sound effect)
             end
+            TriggerEvent('introCinematic:start')
         end, data)
     end)
 end

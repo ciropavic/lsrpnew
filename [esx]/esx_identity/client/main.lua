@@ -47,11 +47,26 @@ if not Config.UseDeferrals then
 	-- end)
 
 
+	-- RegisterNUICallback('register', function(data, cb)
+	-- 	ESX.TriggerServerCallback('cui_character:updateIdentity', function(callback)
+	-- 		if callback then
+	-- 			ESX.ShowNotification(_U('thank_you_for_registering'))
+    --             TriggerEvent('introCinematic:start')
+	-- 			TriggerEvent('cui_character:setCurrentIdentity', data)
+	-- 			TriggerEvent('cui_character:close', true)
+	-- 			print("player registered")
+	-- 		else
+	-- 			ESX.ShowNotification(_U('registration_error'))
+	-- 		end
+	-- 	end, data)
+	-- end)
+	
 	RegisterNUICallback('register', function(data, cb)
-		ESX.TriggerServerCallback('esx_identity:registerIdentity', function(callback)
+		ESX.TriggerServerCallback('cui_character:updateIdentity', function(callback)
 			if callback then
 				ESX.ShowNotification(_U('thank_you_for_registering'))
 				EnableGui(false)
+				print("player registered")
 				if not ESX.GetConfig().Multichar then TriggerEvent('esx_skin:playerRegistered') end
 			else
 				ESX.ShowNotification(_U('registration_error'), "error",5000)

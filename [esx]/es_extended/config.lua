@@ -21,6 +21,6 @@ Config.NativeNotify             = false -- true = old esx notification
 Config.DisableHealthRegen       = true
 
 Config.Multichar                = false -- Enable support for esx_multicharacter
-Config.Identity                 = true -- Select a characters identity data before they have loaded in (this happens by default with multichar)
+Config.Identity                 = false -- Select a characters identity data before they have loaded in (this happens by default with multichar)
 Config.DistanceGive 			= 4.0 -- Max distance when giving items, weapons etc.
 Config.OnDuty                   = true -- Default state of the on duty system

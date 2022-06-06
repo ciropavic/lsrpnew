@@ -531,7 +531,8 @@ function closeWindow(save) {
             let callbackstring = 'https://cui_character/identityupdate';
             if(!cancelable)
             {
-                callbackstring = 'https://cui_character/identityregister';
+                // callbackstring = 'https://cui_character/identityregister';
+                console.log("register");
             }
             $.post(callbackstring, JSON.stringify({
                 firstname: $("#firstname").val(),

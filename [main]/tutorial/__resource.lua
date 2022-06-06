@@ -1,7 +1,7 @@
 resource_manifest_version '44febabe-d386-4d18-afbe-5e627f4af937'
 
 ui_page "nui/ui.html"
-
+shared_script '@es_extended/imports.lua'
 files {
 	"nui/ui.html",
     "nui/background.jpg",
@@ -35,6 +35,4 @@ server_scripts{
 	'@esx_identity/server/main.lua',
    
 } 
-dependencies {
-    'es_extended'
-}
+dependency 'es_extended'
