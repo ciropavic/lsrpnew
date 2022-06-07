@@ -310,7 +310,7 @@ function loadOptionalIdentity(element, identityData) {
 
         // set the limits (config)
         pdata.find('.name').each(function() {
-            $(this).prop('placeholder', 'max. ' + identityLimits.namemax + ' characters');
+            $(this).prop('placeholder', '최대 ' + identityLimits.namemax + ' 글자까지 입력 가능합니다');
         });
         let sliderheight = pdata.find('input[type="range"]').first();
         sliderheight.prop('min', identityLimits.heightmin);
@@ -585,9 +585,9 @@ $('#main .menuclose').on('click', function(evt) {
     }
 
     let action = accept ? 'save' : 'discard';
-    let message = 'Are you sure you want to ' + action + ' your changes and exit?';
+    let message = '입력하신 정보로 당신의 계정을 저장하시겠습니까?';
     let popupData = { 
-        title: 'confirmation', 
+        title: '계정 생성', 
         message: message
     };
     openPopup(popupData, closeWindow, accept);

@@ -2087,7 +2087,7 @@ if Config.EnableESXIdentityIntegration then
                     newCharacter = false
                 end
             else
-               -- ESX.ShowNotification(_U('registration_error')) TODO: Notification (or sound effect)
+              ESX.ShowNotification('누락 된 항목이 있습니다.') --TODO: Notification (or sound effect)
             end
         end, data)
     end)
