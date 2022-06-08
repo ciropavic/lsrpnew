@@ -476,11 +476,11 @@ ESX.RegisterServerCallback('kuana:checkOwnerOfCar',function(source,cb,plate)
 	MySQL.Async.fetchAll('SELECT * FROM owned_vehicles WHERE owner = @owner',{
 		['@owner'] = identifier
 	},function (result)
-		print(identifier);
-		print(plate);
+		-- print(identifier);
+		-- print(plate);
 		if result then
 			for key in pairs(result) do
-				print(result[key].plate);
+				-- print(result[key].plate);
 				if result[key].plate == plate then
 				resultcb = 1
 				cb(resultcb)

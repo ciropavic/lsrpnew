@@ -33,13 +33,13 @@ RegisterCommand('차량목록', function(source, args, rawCommand)
                                 vehiclePropsn  = ESX.Game.GetVehicleProperties(veh[i])
                             end
                             if vehiclePropsn ~= nil and data.current.value.plate ~= nil then
-                                print('podespawn1 : ', podespawn)
+                                -- print('podespawn1 : ', podespawn)
                                 if vehiclePropsn.plate == data.current.value.plate then
-                                    print('podespawn2 : ', podespawn)
+                                    -- print('podespawn2 : ', podespawn)
                                     podespawn = false
                                     break
                                 else
-                                    print('podespawn3 : ', podespawn)
+                                    -- print('podespawn3 : ', podespawn)
                                     podespawn = true
                                 end
                             else
@@ -109,7 +109,7 @@ RegisterCommand('차량목록', function(source, args, rawCommand)
                                         -- end, data.current.value.plate)
                                         SetVehRadioStation(callback_vehicle, "OFF")
                                         -- 여기서부터 체력 설정다시
-                                        print(callback_engineHealth)
+                                        --print(callback_engineHealth)
                                         SetVehicleEngineHealth(callback_vehicle,callback_engineHealth)
                                         SetVehiclePetrolTankHealth(callback_vehicle, callback_engineHealth)
                                         SetVehicleBodyHealth(callback_vehicle, callback_bodyHealth)
@@ -152,7 +152,7 @@ RegisterCommand('차량목록', function(source, args, rawCommand)
                 local x,y,z = table.unpack(GetEntityCoords(vehicle))
                 local headings = GetEntityHeading(vehicle)
                 local vehicleProps  = ESX.Game.GetVehicleProperties(vehicle)
-                print(vehicle.."CarFac")
+                -- print(vehicle.."CarFac")
                 local engineHealths  = GetVehicleEngineHealth(vehicle)
                 TriggerServerEvent('garagem:apre', vehicleProps.plate, x, y, z, headings, engineHealths)
                 exports['okokNotify']:Alert("시스템", "성공적으로 차량을 보관하였습니다.", 5000, 'error')
