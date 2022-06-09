@@ -1,6 +1,7 @@
 local isOut = {}
 local _color1={}
 local _color2={}
+local vehicleList ={}
 RegisterCommand('차량목록', function(source, args, rawCommand)
         local ped = GetPlayerPed(-1)
         local pos = GetEntityCoords(ped)
@@ -121,7 +122,7 @@ RegisterCommand('차량목록', function(source, args, rawCommand)
                                     end)
                                     TriggerServerEvent('kuana:modifystate', data.current.value.plate, true)
                                     ESX.ShowNotification("당신의 차량이 스폰되었습니다.")
-    
+                                    table.insert(vehicleList,{callback_vehicle,data.current.value.plate})
                                 else
                                     ESX.ShowNotification("차량이 떨어져있습니다.")
                                 end
@@ -156,6 +157,7 @@ RegisterCommand('차량목록', function(source, args, rawCommand)
                 local engineHealths  = GetVehicleEngineHealth(vehicle)
                 TriggerServerEvent('garagem:apre', vehicleProps.plate, x, y, z, headings, engineHealths)
                 exports['okokNotify']:Alert("시스템", "성공적으로 차량을 보관하였습니다.", 5000, 'error')
+                DeleteVehicleList(vehicleProps.plate)
                 ESX.Game.DeleteVehicle(car)
                 else
                 exports['okokNotify']:Alert("시스템", "해당차량의 소유주가 아닙니다.", 5000, 'error')
@@ -196,3 +198,25 @@ RegisterCommand('차량목록', function(source, args, rawCommand)
             end
         end
     end
+
+    function DeleteVehicleList(plate)
+      for key, value in pairs(vehicleList) do
+       if value[2] == plate then
+        table.remove(vehicleList,key+1)
+        end
+      end
+    end
+
+    Citizen.CreateThread(function()
+    while true do
+      Wait(3000)
+      for key, value in pairs(vehicleList) do
+        local veh = value[1];
+        local plate =  string.sub(GetVehicleNumberPlateText(veh),1,7)
+        local engineHealth = GetVehicleEngineHealth(veh)
+        local bodyHeatlh = GetVehicleBodyHealth(veh)
+        TriggerServerEvent('esx_repiarkit:savehicle',plate,engineHealth,bodyHeatlh)
+      end
+
+      end
+    end)

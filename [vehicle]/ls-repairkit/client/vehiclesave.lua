@@ -1,5 +1,6 @@
 ESX						= nil
 
+local p
 Citizen.CreateThread(function()
 	while ESX == nil do
 		TriggerEvent('esx:getSharedObject', function(obj) ESX = obj end)
@@ -63,6 +64,8 @@ function GetARangeVehicle()
       local plate =  string.sub(GetVehicleNumberPlateText(veh),1,7)
       local engineHealth = GetVehicleEngineHealth(veh)
       local bodyHeatlh = GetVehicleBodyHealth(veh)
+
+
       TriggerServerEvent('esx_repiarkit:savehicle',plate,engineHealth,bodyHeatlh)
     end
     
@@ -70,10 +73,10 @@ function GetARangeVehicle()
 end
 
 -- c
-Citizen.CreateThread(function()
-  while true do 
-    Wait(1000)
-GetARangeVehicle()
-  end
+-- Citizen.CreateThread(function()
+--   while true do 
+--     Wait(3000)
+-- GetARangeVehicle()
+--   end
 
-end)
+-- end)
