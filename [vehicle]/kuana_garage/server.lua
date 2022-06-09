@@ -520,6 +520,39 @@ ESX.RegisterServerCallback('kuana:checkOwnerOfCar',function(source,cb,plate)
 
 end)
 
+
+ESX.RegisterServerCallback('kuana:checkOwnerOfVehicle',function(source,cb,plate)
+
+	local _source = source
+	local xPlayer = ESX.GetPlayerFromId(_source)
+	local identifier = GetPlayerIdentifiers(source)
+	local vehicles = {}
+	local owner
+	print("test513"..plate)
+	MySQL.Async.fetchAll("SELECT * FROM owned_vehicles WHERE plate=@plate",{['@plate'] = plate}, function(data) 
+		for _,v in pairs(data) do
+			local vehicle = json.decode(v.vehicle)
+			owner = v.owner
+			table.insert(vehicles, {vehicle = vehicle, state = v.state, lock = v.lockcheck, target = owner})
+		end
+		-- print('vehicles[target] : ' ,vehicles['target'])
+		-- print('vehicle table : ', tdump(vehicles))
+		-- print('vehicle table2 : ', vehicles[1]['target'])
+		-- print('xPlayer.identifier : ', xPlayer.identifier)
+		print(xPlayer.identifier)
+		print(json.encode(vehicles))
+		if owner == xPlayer.identifier then
+			print("owner correct")
+			cb(vehicles)
+		else
+			cb(nil)
+			print("owner incorrect")
+		end
+
+	end)
+
+end)
+
 ESX.RegisterServerCallback("kuana:returnOwner", function(cb,plate)
 	MySQL.Async.fetchAll("SELECT * FROM owned_vehicles WHERE plate=@plate",{['@plate'] = plate}, function(data) 
 		local owner

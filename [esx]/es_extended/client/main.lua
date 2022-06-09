@@ -1,5 +1,15 @@
 local pickups = {}
 
+
+--맥스체력 정해주는 구간
+Citizen.CreateThread(function()
+	while true do
+		SetPedMaxHealth(GetPlayerPed(-1),200)
+		SetPlayerHealthRechargeMultiplier(PlayerId(), 0.0)
+		Citizen.Wait(0)
+	end
+end)
+
 CreateThread(function()
 	while not Config.Multichar do
 		Wait(0)

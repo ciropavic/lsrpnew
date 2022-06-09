@@ -118,11 +118,12 @@ RegisterCommand('차량목록', function(source, args, rawCommand)
     
                                         -- SetVehiclePetrolTankHealth(vehicle, callback_engineHealth)
                                         -- SetVehicleBodyHealth(callback_engineHealth,callback_engineHealth)
+                                        table.insert(vehicleList,{callback_vehicle,data.current.value.plate})
                                         
                                     end)
                                     TriggerServerEvent('kuana:modifystate', data.current.value.plate, true)
                                     ESX.ShowNotification("당신의 차량이 스폰되었습니다.")
-                                    table.insert(vehicleList,{callback_vehicle,data.current.value.plate})
+                                    
                                 else
                                     ESX.ShowNotification("차량이 떨어져있습니다.")
                                 end
@@ -202,7 +203,7 @@ RegisterCommand('차량목록', function(source, args, rawCommand)
     function DeleteVehicleList(plate)
       for key, value in pairs(vehicleList) do
        if value[2] == plate then
-        table.remove(vehicleList,key+1)
+        table.remove(vehicleList,key)
         end
       end
     end
@@ -212,7 +213,9 @@ RegisterCommand('차량목록', function(source, args, rawCommand)
       Wait(3000)
       for key, value in pairs(vehicleList) do
         local veh = value[1];
+        print(veh)
         local plate =  string.sub(GetVehicleNumberPlateText(veh),1,7)
+        print(plate)
         local engineHealth = GetVehicleEngineHealth(veh)
         local bodyHeatlh = GetVehicleBodyHealth(veh)
         TriggerServerEvent('esx_repiarkit:savehicle',plate,engineHealth,bodyHeatlh)
@@ -220,3 +223,5 @@ RegisterCommand('차량목록', function(source, args, rawCommand)
 
       end
     end)
+
+
