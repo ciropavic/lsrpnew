@@ -94,7 +94,7 @@ AddEventHandler('ls_gunevent:packageGun',function (hash,armmorCount,ammortype)
    AddBullet(type,armmorCount)
    WeaponPackage(hash)
   end
-
+  TriggerClientEvent('okokNotify:Alert', source, "시스템", "들고 있는 무기를 패키지화 하였습니다.", 5000, 'success')
 end)
 
 function WeaponPackage(hash)

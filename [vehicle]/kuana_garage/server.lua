@@ -401,8 +401,8 @@ ESX.RegisterServerCallback('kuana:checkcoordsall', function(source, cb, plate)
 	local color2 = MySQL.Sync.fetchScalar("SELECT color2 FROM owned_vehicles WHERE plate = @plate", {['@plate'] = plate})
 	local enginehealth = MySQL.Sync.fetchScalar("SELECT enginehealth FROM owned_vehicles WHERE plate = @plate", {['@plate'] = plate})
   local bodyhealth =  MySQL.Sync.fetchScalar("SELECT bodyhealth FROM owned_vehicles WHERE plate = @plate", {['@plate'] = plate})
-
-	cb(xx, yy, zz, hh,enginehealth,bodyhealth,color1,color2)
+  local fuel = MySQL.Sync.fetchScalar("SELECT fuel FROM owned_vehicles WHERE plate = @plate", {['@plate'] = plate})
+	cb(xx, yy, zz, hh,enginehealth,bodyhealth,color1,color2,fuel)
 end)
 
 

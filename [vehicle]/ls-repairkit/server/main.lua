@@ -124,7 +124,7 @@ AddEventHandler('esx_repairkit:removeTyreKit', function()
 end)
 
 RegisterNetEvent('esx_repiarkit:savehicle')
-AddEventHandler('esx_repiarkit:savehicle',function(vehplate,engineHealth,bodyHealth)
+AddEventHandler('esx_repiarkit:savehicle',function(vehplate,engineHealth,bodyHealth,fuel)
 --   print(vehplate)
  -- print(engineHealth)
    local _isSerch = 0;
@@ -134,10 +134,10 @@ AddEventHandler('esx_repiarkit:savehicle',function(vehplate,engineHealth,bodyHea
     --발견되지 않았다면 0으로 고정될 것이고, 해당 차량을 서버에 등록 시켜준다.
     if value[1] == vehplate then
       _isSerch = 1;
-      -- 차량을 확인 후, 혹시나 엔진 체력이 다를 경우 바뀐 값을 넣어준다.
-      if value[2] ~= engineHealth or value[3] ~= bodyHealth then
+      -- 차량을 확인 후, 혹시나 엔진 체력이 다를 경우 바뀐 값을 넣어준다. 기름이 달라도 넣어준다.
+      if value[2] ~= engineHealth or value[3] ~= bodyHealth or value[4] ~= fuel then
         -- table의 경우 중간값을 바꿀 수 없기 때문에 추가하고 삭제를 해줘야한다.
-        table.insert(vehicleList,key,{vehplate,engineHealth,bodyHealth})
+        table.insert(vehicleList,key,{vehplate,engineHealth,bodyHealth,fuel})
         table.remove(vehicleList,key+1)
       end
     end
@@ -173,9 +173,10 @@ Citizen.CreateThread(function()
             -- print(value[2])
             -- print(value[1])
             if value[2] > 0 then
-              MySQL.Async.execute("UPDATE owned_vehicles SET enginehealth = @health,bodyhealth = @bodyhealth WHERE plate = @plate", {
+              MySQL.Async.execute("UPDATE owned_vehicles SET enginehealth = @health,bodyhealth = @bodyhealth, fuel = @fuel WHERE plate = @plate ", {
                 ['@health'] = value[2],
                 ['@bodyhealth'] = value[3],
+                ['@fuel'] = value[4],
                 ['@plate'] = value[1]
                  },
                   function(result)

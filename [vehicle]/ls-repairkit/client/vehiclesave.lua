@@ -64,9 +64,9 @@ function GetARangeVehicle()
       local plate =  string.sub(GetVehicleNumberPlateText(veh),1,7)
       local engineHealth = GetVehicleEngineHealth(veh)
       local bodyHeatlh = GetVehicleBodyHealth(veh)
+      local fuel = exports["LegacyFuel"]:GetFuel(veh)
 
-
-      TriggerServerEvent('esx_repiarkit:savehicle',plate,engineHealth,bodyHeatlh)
+      TriggerServerEvent('esx_repiarkit:savehicle',plate,engineHealth,bodyHeatlh,fuel)
     end
     
   end

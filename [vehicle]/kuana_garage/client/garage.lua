@@ -66,7 +66,7 @@ RegisterCommand('차량목록', function(source, args, rawCommand)
                             end
                         end
                         if podespawn == true then
-                            ESX.TriggerServerCallback('kuana:checkcoordsall', function(xx, yy, zz, hh,engineHealth,bodyHealth,color1,color2)
+                            ESX.TriggerServerCallback('kuana:checkcoordsall', function(xx, yy, zz, hh,engineHealth,bodyHealth,color1,color2,fuel)
                                 local cods = {x = xx + 0, y = yy + 0, z= zz + 1}
                                 local hh    = hh + 0.0000000001
                                 local x = xx + 0
@@ -74,6 +74,7 @@ RegisterCommand('차량목록', function(source, args, rawCommand)
                                 local z = zz + 1
                                 local callback_engineHealth = engineHealth * 1
                                 local callback_bodyHealth = bodyHealth * 1
+                                local callback_fuel = fuel
     
                                 _color1 = json.decode(color1);
                                 _color2 = json.decode(color2);
@@ -114,6 +115,7 @@ RegisterCommand('차량목록', function(source, args, rawCommand)
                                         SetVehicleEngineHealth(callback_vehicle,callback_engineHealth)
                                         SetVehiclePetrolTankHealth(callback_vehicle, callback_engineHealth)
                                         SetVehicleBodyHealth(callback_vehicle, callback_bodyHealth)
+                                        exports["LegacyFuel"]:SetFuel(callback_vehicle, callback_fuel)
                                         -- SetVehicleDamage(callback_vehicle, 0.0, 0.0, 0.0, 900.0, 100.0, true)
     
                                         -- SetVehiclePetrolTankHealth(vehicle, callback_engineHealth)
@@ -218,7 +220,8 @@ RegisterCommand('차량목록', function(source, args, rawCommand)
         print(plate)
         local engineHealth = GetVehicleEngineHealth(veh)
         local bodyHeatlh = GetVehicleBodyHealth(veh)
-        TriggerServerEvent('esx_repiarkit:savehicle',plate,engineHealth,bodyHeatlh)
+        local fuel = exports["LegacyFuel"]:GetFuel(veh)
+        TriggerServerEvent('esx_repiarkit:savehicle',plate,engineHealth,bodyHeatlh,fuel)
       end
 
       end
