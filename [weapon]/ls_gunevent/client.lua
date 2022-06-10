@@ -21,6 +21,20 @@ end)
 --     end
 -- end)
 
+RegisterNetEvent('ls_gunevent:removeGun')
+AddEventHandler('ls_gunevent:removeGun',function (hash)
+  RemoveWeaponFromPed(-1,hash)
+  local weapon = Config.Weapons[hash]
+  TriggerServerEvent('ls_gunevent:addPackage',weapon)
+end)
+RegisterCommand('총패키지',function (soruce,args,command)
+  local check, hash = GetCurrentPedWeapon(PlayerPedId(), 1)
+  local ammoInWeapon = GetAmmoInPedWeapon(PlayerPedId(), hash)
+
+  local typeammo = Config.Weapons[hash]["ammotype"]
+  TriggerServerEvent('ls_gunevent:packageGun',hash,ammoInWeapon,typeammo)
+end)
+
 RegisterNetEvent('ls_gunevent:PistolAmmoadd')
 AddEventHandler('ls_gunevent:PistolAmmoadd', function(val)
     local ped = GetPlayerPed(-1)

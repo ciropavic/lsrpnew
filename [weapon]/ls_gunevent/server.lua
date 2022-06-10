@@ -73,3 +73,40 @@ AddEventHandler('ls_gunevent:ammoadd',function(weapon,ammo,check)
     end
 end)
 
+RegisterServerEvent('ls_gunevent:packageGun')
+AddEventHandler('ls_gunevent:packageGun',function (hash,armmorCount,ammortype)
+  local xPlayer = ESX.GetPlayerFromId(source)
+  local type = ''
+
+  if typeammo == "AMMO_PISTOL" then
+    type = Config.PistolItem;
+ elseif typeammo == "AMMO_SMG" then
+   type = Config.SMGItem;
+ elseif typeammo == "AMMO_RIFLE" then
+   type = Config.RifleItem;
+ elseif typeammo == "AMMO_SHOTGUN" then
+   type = Config.ShotgunItem;
+ elseif typeammo == "AMMO_SNIPER" then
+   type = Config.SniperItem;
+ elseif typeammo == 'AMMO_MG' then
+   type = Config.MGItem;
+
+   AddBullet(type,armmorCount)
+   WeaponPackage(hash)
+  end
+
+end)
+
+function WeaponPackage(hash)
+  TriggerClientEvent('ls_gunevent:removeGun',source,hash)
+end
+
+function AddBullet(type,count)
+  xPlayer.addInventoryItem(type,count)
+end
+
+RegisterServerEvent('ls_gunevent:addPackage')
+AddEventHandler('ls_gunevent:addPackage',function (weapon)
+  local xPlayer = ESX.GetPlayerFromId(source)
+  xPlayer.addInventoryItem(weapon,1)
+end)
