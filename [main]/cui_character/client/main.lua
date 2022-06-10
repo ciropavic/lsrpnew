@@ -1556,7 +1556,7 @@ end
 
 function GetDefaultCharacter(isMale)
     local result = {
-        sex = 1,みなとこ
+        sex = 1,
         mom = 21,
         dad = 0,
         face_md_weight = 50,

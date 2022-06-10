@@ -6,7 +6,7 @@ local showHelp = false
 local activated
 local hasSeatbelt
 
-RegisterKeyMapping('seatbelt', 'Seatbelt', 'keyboard', Constants.DefaultKeybind)
+RegisterKeyMapping('seatbelt', 'Seatbelt', 'keyboard', Constants.Control)
 RegisterFrameworkCommand('seatbelt', function()
   local ped = PlayerPedId()
   if IsPedInAnyVehicle(ped) then

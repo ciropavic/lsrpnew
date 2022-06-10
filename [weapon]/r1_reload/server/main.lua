@@ -23,11 +23,12 @@ AddEventHandler("r1reload:checkInventory", function(typeammo,reloadSize)
   end
 
     local xItem = xPlayer.getInventoryItem(type)
+    print(xItem)
 
     if xItem.count >= reloadSize then
       TriggerClientEvent("r1reload:reload", source, true,reloadSize,type)
     else 
-      if xItem.count > 1 then
+      if xItem.count >= 1 and xItem.count < reloadSize then
         TriggerClientEvent("r1reload:reload", source, true,xItem.count,type)
       else  
         TriggerClientEvent("r1reload:reload", source, false,reloadSize,type)
@@ -44,6 +45,6 @@ RegisterNetEvent("r1reload:removeAmmoBox")
 AddEventHandler("r1reload:removeAmmoBox", function(typeammo,reloadSize)
     local xPlayer = ESX.GetPlayerFromId(source)
     local xItem = xPlayer.getInventoryItem(typeammo)
-
+      -- print(typeammo)
     xPlayer.removeInventoryItem(typeammo, reloadSize)
 end)

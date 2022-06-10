@@ -24,6 +24,7 @@ Config.Notifications = {
 }
 
 
+
 Config.Weapons = {
 	[GetHashKey("weapon_unarmed")] 				 = {["ammotype"] = nil 				    },
 	[GetHashKey("weapon_knife")] 				 = {["ammotype"] = nil					},

@@ -40,11 +40,11 @@ print(json.encode({r = red, g = green, b = blue}))
   if xPlayer.getMoney() >= tonumber(price) then
     xPlayer.removeMoney(tonumber(price))
     TriggerClientEvent('eotix-vehicleshop:receiveInfo', _source, xPlayer.getMoney())   
-    buyCar()
+    buyCar(_source,veh, price, name, vehicleProps,red,green,blue,red2,green2,blue2)
   elseif xPlayer.getAccount('bank').money >= tonumber(price) then
     xPlayer.removeAccountMoney('bank', tonumber(price))
     TriggerClientEvent('eotix-vehicleshop:receiveInfo', _source, xPlayer.getAccount('bank').money)
-    buyCar()  
+    buyCar(_source,veh, price, name, vehicleProps,red,green,blue,red2,green2,blue2)  
 
   else
     TriggerClientEvent('okokNotify:Alert', source, "시스템", "돈이 모자랍니다.", 5000, 'error')
@@ -61,8 +61,8 @@ print(json.encode({r = red, g = green, b = blue}))
 	-- end
 end)
 
-function buyCar()
-
+function buyCar(_source,veh, price, name, vehicleProps,red,green,blue,red2,green2,blue2)
+	local xPlayer = ESX.GetPlayerFromId(_source)
   MySQL.Async.execute('INSERT INTO owned_vehicles (owner, plate, vehicle,color1,color2,enginehealth) VALUES (@owner, @plate, @vehicle,@color1,@color2,@enginehealth)',
 	{
 		['@owner']   = xPlayer.identifier,

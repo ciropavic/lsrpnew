@@ -361,7 +361,7 @@ end)
 -- 어드민 채팅
 RegisterCommand('ab', function(source, args, user)
     local iden = getIdentity(source)
-    local name = ('%s'):format(iden.aname)
+    local name = ('%s %s'):format(iden.firstname, iden.lastname)
 
     local xPlayers = ESX.GetPlayers()
 
@@ -379,7 +379,9 @@ end, false)
 -- 관리자 호출
 RegisterCommand('관리자', function(source, args, user)
   local iden = getIdentity(source)
-  local name = ('%s'):format(iden.aname)
+  local name = ('%s %s'):format(iden.firstname, iden.lastname)
+--   print(iden)
+--   print(name)
 
   local xPlayers = ESX.GetPlayers()
 

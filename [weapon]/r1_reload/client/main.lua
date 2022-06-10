@@ -34,8 +34,10 @@ Citizen.CreateThread(function()
 			end
 
 			if not antiSpam then
+				
 				if IsControlJustReleased(0, 45) then
 					if Config.Framework == "ESX" then
+						-- print("click")
 						TriggerServerEvent("r1reload:checkInventory", typeammo,reloadSize)
 					elseif Config.Framework == "STANDALONE" then
 						TriggerEvent("r1reload:reload")
@@ -62,12 +64,18 @@ AddEventHandler("r1reload:reload", function(checkItem,reloadSize,type)
 				local check1, hash = GetCurrentPedWeapon(PlayerPedId(), 1)
 				local clipSize = GetWeaponClipSize(hash)
         -- local typeammo = Config.Weapons[hash]["ammotype"]
-				local check2, ammoInClip = GetAmmoInClip(PlayerPedId(), hash)
-
+				local check2, ammoInClip = GetAmmoInClip(PlayerPedId(), hash) 
+				local ammoInWeapon = GetAmmoInPedWeapon(PlayerPedId(), hash) 
+				ammoInWeapon = ammoInWeapon + reloadSize
+				if ammoInWeapon > clipSize then
+					ammoInWeapon = ammoInClip
+				end	
+				-- print(ammoInWeapon)
 				if ammoInClip ~= clipSize then
 					TriggerServerEvent("r1reload:removeAmmoBox",type,reloadSize)
 					SetAmmoInClip(PlayerPedId(), hash, 0)
-					SetPedAmmo(PlayerPedId(), hash, clipSize)
+					
+					SetPedAmmo(PlayerPedId(), hash, ammoInWeapon)
 				else
 					if Config.NotificationStyle == "ESX" then
 						ESX.ShowNotification(Config.Notifications.FullClip)
