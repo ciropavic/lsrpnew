@@ -34,17 +34,36 @@ local xPlayer = ESX.GetPlayerFromId(_source)
 print(red)
 print(red2)
 print(json.encode({r = red, g = green, b = blue}))
-if xPlayer.getMoney() >= tonumber(price) or xPlayer.getAccount('bank').money >= tonumber(price) then
-	xPlayer.removeMoney(tonumber(price))
+-- if xPlayer.getMoney() >= tonumber(price) or xPlayer.getAccount('bank').money >= tonumber(price) then
+-- 	xPlayer.removeMoney(tonumber(price))
+
+  if xPlayer.getMoney() >= tonumber(price) then
+    xPlayer.removeMoney(tonumber(price))
+    TriggerClientEvent('eotix-vehicleshop:receiveInfo', _source, xPlayer.getMoney())   
+    buyCar()
+  elseif xPlayer.getAccount('bank').money >= tonumber(price) then
+    xPlayer.removeAccountMoney('bank', tonumber(price))
+    TriggerClientEvent('eotix-vehicleshop:receiveInfo', _source, xPlayer.getAccount('bank').money)
+    buyCar()  
+
+  else
+    TriggerClientEvent('okokNotify:Alert', source, "시스템", "돈이 모자랍니다.", 5000, 'error')
+  end
+
 	if Config.SpawnVehicle then
 		stateVehicle = 0
 	else
 		stateVehicle = 1
 	end
 
+	-- else
+  --       TriggerClientEvent('mythic_notify:client:SendAlert', _source, { type = 'inform', text = 'Not Enough Money'})
+	-- end
+end)
 
+function buyCar()
 
-	MySQL.Async.execute('INSERT INTO owned_vehicles (owner, plate, vehicle,color1,color2,enginehealth) VALUES (@owner, @plate, @vehicle,@color1,@color2,@enginehealth)',
+  MySQL.Async.execute('INSERT INTO owned_vehicles (owner, plate, vehicle,color1,color2,enginehealth) VALUES (@owner, @plate, @vehicle,@color1,@color2,@enginehealth)',
 	{
 		['@owner']   = xPlayer.identifier,
 		['@plate']   = vehicleProps.plate,
@@ -64,13 +83,10 @@ if xPlayer.getMoney() >= tonumber(price) or xPlayer.getAccount('bank').money >= 
 		end)
 
 		TriggerClientEvent("eotix-vehicleshop:successfulbuy", _source, name, vehicleProps.plate, price)
-		TriggerClientEvent('eotix-vehicleshop:receiveInfo', _source, xPlayer.getMoney())   
+	
 		TriggerClientEvent('eotix-vehicleshop:spawnVehicle', _source, veh, vehicleProps.plate)
 	end)
-	else
-        TriggerClientEvent('mythic_notify:client:SendAlert', _source, { type = 'inform', text = 'Not Enough Money'})
-	end
-end)
+end
 -- // I AM SORRY FOR EVERYONE WHO DOWNLOADED THAT SCRIPT AND IT DON WORKED \\ --
 -- // ITS NOW THE FIXED VERSION  \\ -- -- // Eotix#1337 \\ -- -- // Eotix#1337 \\ --
 -- // REMOVES MONEY AND IF YOU DONT HAVE ENOUGH IT DONT GIVE YOU THE VEHICLE\\ --

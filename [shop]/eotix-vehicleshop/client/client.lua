@@ -239,8 +239,8 @@ RegisterNUICallback(
         vehicleProps.plate = newPlate
 
         TriggerServerEvent('eotix-vehicleshop:CheckMoneyForVeh',data.modelcar, data.sale, data.name, vehicleProps, rgbColorSelected[1],rgbColorSelected[2],rgbColorSelected[3],math.ceil(rgbColorSelected[1]),math.ceil(rgbColorSelected[2]),math.ceil(rgbColorSelected[3]))
-print(math.ceil(rgbColorSelected[1]))
-print(rgbColorSelected[1])
+-- print(math.ceil(rgbColorSelected[1]))
+-- print(rgbColorSelected[1])
         Wait(1500)        
         -- SendNUIMessage(
         --     {
