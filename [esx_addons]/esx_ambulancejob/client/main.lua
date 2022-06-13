@@ -1,16 +1,112 @@
-local firstSpawn = true
+local firstSpawn, PlayerLoaded = true, false
 
 isDead, isSearched, medic = false, false, 0
+isBleeding = nil
+ESX = nil
+DeathTimerIsRunning = false
+local isUncon = false
+
+AddEventHandler("onClientMapStart", function()
+	-- exports.spawnmanager:spawnPlayer()
+	-- Citizen.Wait(5000)
+	-- exports.spawnmanager:setAutoSpawn(false)
+end)
+
+
+
+Citizen.CreateThread(function()
+	while true do
+
+		Citizen.Wait(5000)
+
+		ESX.TriggerServerCallback("esx_ambulancejob:isbleeding",function(bleeding)
+			isBleeding = bleeding
+
+			local health = GetEntityHealth(GetPlayerPed(-1))
+
+
+			if health < 150 then
+
+				if HasPedBeenDamagedByWeapon(GetPlayerPed(-1),"WEAPON_COMBATPISTOL",0) or
+				HasPedBeenDamagedByWeapon(GetPlayerPed(-1),"WEAPON_PISTOL",0) or
+				HasPedBeenDamagedByWeapon(GetPlayerPed(-1),"WEAPON_PISTOL50",0) or
+				HasPedBeenDamagedByWeapon(GetPlayerPed(-1),"WEAPON_SMG",0) or
+				HasPedBeenDamagedByWeapon(GetPlayerPed(-1),"WEAPON_MICROSMG",0) or
+				HasPedBeenDamagedByWeapon(GetPlayerPed(-1),"WEAPON_SPECIALCARBINE",0) or
+				HasPedBeenDamagedByWeapon(GetPlayerPed(-1),"WEAPON_ASSAULTRIFLE",0) or
+				HasPedBeenDamagedByWeapon(GetPlayerPed(-1),"WEAPON_PUMPSHOTGUN",0) or isBleeding then
+	
+					isBleeding = true
+					TriggerServerEvent("bleeding")
+					
+
+				
+				end
+			else
+				isBleeding = false
+				TriggerServerEvent("bleedstop")
+			end
+		end)
+
+		
+	end
+end)
+
+RegisterNetEvent("esx_ambulancejob:stopbleeding")
+AddEventHandler('esx_ambulancejob:stopbleeding', function()
+	isBleeding = false
+	TriggerServerEvent("bleedstop")
+end)
+
+Citizen.CreateThread(function()
+	while ESX == nil do
+		TriggerEvent('esx:getSharedObject', function(obj) ESX = obj end)
+		Citizen.Wait(0)
+	end
+
+	while ESX.GetPlayerData().job == nil do
+		Citizen.Wait(100)
+	end
+
+	PlayerLoaded = true
+	ESX.PlayerData = ESX.GetPlayerData()
+end)
+
+Citizen.CreateThread(function()
+	while true do
+		local health = GetEntityHealth(PlayerPedId())
+		if(health < 110 and health > 100 and DeathTimerIsRunning == false) then
+			StartDeathTimer()
+			-- StartDistressSignal()
+			DeathTimerIsRunning = true
+			
+		end
+		if(health < 110 and health >= 0) then
+			SetPedToRagdoll(GetPlayerPed(-1), 1000, 1000, 0, 0, 0, 0)
+			
+		elseif health >= 110 then
+			StopScreenEffect("DeathFailOut")
+			isDead = false
+			DeathTimerIsRunning = false
+		end
+		-- print(DeathTimerIsRunning)
+		Citizen.Wait(0)
+	end	
+end)
+
+
 
 RegisterNetEvent('esx:playerLoaded')
 AddEventHandler('esx:playerLoaded', function(xPlayer)
-	ESX.PlayerLoaded = true
+	ESX.PlayerData = xPlayer
+	PlayerLoaded = true
+	
+
 end)
 
-RegisterNetEvent('esx:onPlayerLogout')
-AddEventHandler('esx:onPlayerLogout', function()
-	ESX.PlayerLoaded = false
-	firstSpawn = true
+RegisterNetEvent('esx:setJob')
+AddEventHandler('esx:setJob', function(job)
+	ESX.PlayerData.job = job
 end)
 
 AddEventHandler('esx:onPlayerSpawn', function()
@@ -19,14 +115,14 @@ AddEventHandler('esx:onPlayerSpawn', function()
 	if firstSpawn then
 		firstSpawn = false
 
-		if Config.SaveDeathStatus then
-			while not ESX.PlayerLoaded do
-				Wait(1000)
+		if Config.AntiCombatLog then
+			while not PlayerLoaded do
+				Citizen.Wait(5000)
 			end
 
 			ESX.TriggerServerCallback('esx_ambulancejob:getDeathStatus', function(shouldDie)
 				if shouldDie then
-					Wait(1000)
+					Citizen.Wait(10000)
 					SetEntityHealth(PlayerPedId(), 0)
 				end
 			end)
@@ -35,7 +131,7 @@ AddEventHandler('esx:onPlayerSpawn', function()
 end)
 
 -- Create blips
-CreateThread(function()
+Citizen.CreateThread(function()
 	for k,v in pairs(Config.Hospitals) do
 		local blip = AddBlipForCoord(v.Blip.coords)
 
@@ -48,30 +144,37 @@ CreateThread(function()
 		AddTextComponentSubstringPlayerName(_U('blip_hospital'))
 		EndTextCommandSetBlipName(blip)
 	end
+end)
 
-	while true do 
-		local Sleep = 1500
-		
+-- Disable most inputs when dead
+Citizen.CreateThread(function()
+	while true do
+		Citizen.Wait(0)
+
 		if isDead then
-			Sleep = 0
 			DisableAllControlActions(0)
 			EnableControlAction(0, 47, true)
 			EnableControlAction(0, 245, true)
 			EnableControlAction(0, 38, true)
-
-			if isSearched then
-				local playerPed = PlayerPedId()
-				local ped = GetPlayerPed(GetPlayerFromServerId(medic))
-				isSearched = false
-	
-				AttachEntityToEntity(playerPed, ped, 11816, 0.54, 0.54, 0.0, 0.0, 0.0, 0.0, false, false, false, false, 2, true)
-				Wait(1000)
-				DetachEntity(playerPed, true, false)
-				ClearPedTasksImmediately(playerPed)
-			end
+		else
+			Citizen.Wait(500)
 		end
+	end
+end)
 
-		Wait(Sleep)
+Citizen.CreateThread(function()
+	while true do
+		Citizen.Wait(0)
+		if isDead and isSearched then
+			local playerPed = PlayerPedId()
+			local ped = GetPlayerPed(GetPlayerFromServerId(medic))
+			isSearched = false
+
+			AttachEntityToEntity(playerPed, ped, 11816, 0.54, 0.54, 0.0, 0.0, 0.0, 0.0, false, false, false, false, 2, true)
+			Citizen.Wait(1000)
+			DetachEntity(playerPed, true, false)
+			ClearPedTasksImmediately(playerPed)
+		end
 	end
 end)
 
@@ -98,11 +201,11 @@ function OnPlayerDeath()
 	isDead = true
 	ESX.UI.Menu.CloseAll()
 	TriggerServerEvent('esx_ambulancejob:setDeathStatus', true)
-
+	TriggerEvent("playerdied")
 	StartDeathTimer()
-	StartDistressSignal()
+	-- StartDistressSignal()
 
-	AnimpostfxPlay('DeathFailOut', 0, false)
+	StartScreenEffect('DeathFailOut', 0, false)
 end
 
 RegisterNetEvent('esx_ambulancejob:useItem')
@@ -116,9 +219,10 @@ AddEventHandler('esx_ambulancejob:useItem', function(itemName)
 		ESX.Streaming.RequestAnimDict(lib, function()
 			TaskPlayAnim(playerPed, lib, anim, 8.0, -8.0, -1, 0, 0, false, false, false)
 
-			Wait(500)
+			exports['rprogress']:Start('치료중', 5000)
+			ClearPedTasksImmediately(GetPlayerPed(-1))
 			while IsEntityPlayingAnim(playerPed, lib, anim, 3) do
-				Wait(0)
+				Citizen.Wait(0)
 				DisableAllControlActions(0)
 			end
 
@@ -133,9 +237,10 @@ AddEventHandler('esx_ambulancejob:useItem', function(itemName)
 		ESX.Streaming.RequestAnimDict(lib, function()
 			TaskPlayAnim(playerPed, lib, anim, 8.0, -8.0, -1, 0, 0, false, false, false)
 
-			Wait(500)
+			exports['rprogress']:Start('치료중', 5000)
+			ClearPedTasksImmediately(GetPlayerPed(-1))
 			while IsEntityPlayingAnim(playerPed, lib, anim, 3) do
-				Wait(0)
+				Citizen.Wait(0)
 				DisableAllControlActions(0)
 			end
 
@@ -146,11 +251,11 @@ AddEventHandler('esx_ambulancejob:useItem', function(itemName)
 end)
 
 function StartDistressSignal()
-	CreateThread(function()
+	Citizen.CreateThread(function()
 		local timer = Config.BleedoutTimer
 
 		while timer > 0 and isDead do
-			Wait(0)
+			Citizen.Wait(0)
 			timer = timer - 30
 
 			SetTextFont(4)
@@ -215,119 +320,156 @@ function StartDeathTimer()
 	local earlySpawnTimer = ESX.Math.Round(Config.EarlyRespawnTimer / 1000)
 	local bleedoutTimer = ESX.Math.Round(Config.BleedoutTimer / 1000)
 
-	CreateThread(function()
+	Citizen.CreateThread(function()
 		-- early respawn timer
-		while earlySpawnTimer > 0 and isDead do
-			Wait(1000)
+		while earlySpawnTimer > 0 and not isDead do
+			Citizen.Wait(1000)
 
 			if earlySpawnTimer > 0 then
 				earlySpawnTimer = earlySpawnTimer - 1
 			end
 		end
-
+		isDead = true
 		-- bleedout timer
 		while bleedoutTimer > 0 and isDead do
-			Wait(1000)
-
+			Citizen.Wait(1000)
+			
 			if bleedoutTimer > 0 then
 				bleedoutTimer = bleedoutTimer - 1
 			end
 		end
 	end)
 
-	CreateThread(function()
+	Citizen.CreateThread(function()
 		local text, timeHeld
 
 		-- early respawn timer
-		while earlySpawnTimer > 0 and isDead do
-			Wait(0)
-			text = _U('respawn_available_in', secondsToClock(earlySpawnTimer))
+		while earlySpawnTimer > 0 and not isDead and GetEntityHealth(GetPlayerPed(-1)) < 110 and GetEntityHealth(GetPlayerPed(-1)) > 0 do
+			Citizen.Wait(0)
+			if(earlySpawnTimer >= 60) then
+				text = _U('respawn_available_in', secondsToClock(earlySpawnTimer))
+				DrawGenericTextThisFrame()
+				SetTextFont(0)
+				SetTextEntry('STRING')
+				AddTextComponentString(text)
+				DrawText(0.5, 0.8)
+				StartScreenEffect('DeathFailOut', 0, false)
 
-			DrawGenericTextThisFrame()
-			BeginTextCommandDisplayText('STRING')
-			AddTextComponentSubstringPlayerName(text)
-			EndTextCommandDisplayText(0.5, 0.8)
-		end
 
-		-- bleedout timer
-		while bleedoutTimer > 0 and isDead do
-			Wait(0)
-			text = _U('respawn_bleedout_in', secondsToClock(bleedoutTimer))
+			elseif(earlySpawnTimer < 60) then
+				text = _U('respawn_available_in', secondsToClock(earlySpawnTimer)) .."\n".. _U('respawn_bleedout_prompt')
 
-			if not Config.EarlyRespawnFine then
-				text = text .. _U('respawn_bleedout_prompt')
+				StartScreenEffect('DeathFailOut', 0, false)
+				DrawGenericTextThisFrame()
+				SetTextEntry('STRING')
+				SetTextFont(0)
+				AddTextComponentString(text)
+				DrawText(0.5, 0.8)
 
-				if IsControlPressed(0, 38) and timeHeld > 60 then
-					RemoveItemsAfterRPDeath()
+				if IsControlPressed(0, 38) and isBleeding == false then
+					SetEntityHealth(GetPlayerPed(-1),110)
+					isDead = false
+					DeathTimerIsRunning = false
 					break
 				end
-			elseif Config.EarlyRespawnFine and canPayFine then
-				text = text .. _U('respawn_bleedout_fine', ESX.Math.GroupDigits(Config.EarlyRespawnFineAmount))
 
-				if IsControlPressed(0, 38) and timeHeld > 60 then
-					TriggerServerEvent('esx_ambulancejob:payFine')
-					RemoveItemsAfterRPDeath()
+				if IsControlPressed(0, 47) then
+					SetEntityHealth(GetPlayerPed(-1),0)
+					isDead = true
+					earlySpawnTimer = 0
 					break
 				end
+				
 			end
-
 			if IsControlPressed(0, 38) then
 				timeHeld = timeHeld + 1
 			else
 				timeHeld = 0
 			end
 
+			if IsControlPressed(0, 47) then
+				timeHeld = timeHeld + 1
+			else
+				timeHeld = 0
+			end
+		end
+
+		isDead = true
+		-- bleedout timer
+		while bleedoutTimer > 0 and isDead do
+			Citizen.Wait(0)
+			text = _U('respawn_bleedout_in', secondsToClock(bleedoutTimer))
+			StartScreenEffect('DeathFailOut', 0, false)
+			-- if not Config.EarlyRespawnFine then
+			-- 	text = text .. _U('respawn_bleedout_prompt')
+
+			-- 	if IsControlPressed(0, 38) and timeHeld > 60 then
+			-- 		RemoveItemsAfterRPDeath()
+			-- 		break
+			-- 	end
+			-- elseif Config.EarlyRespawnFine and canPayFine then
+			-- 	text = text .. _U('respawn_bleedout_fine', ESX.Math.GroupDigits(Config.EarlyRespawnFineAmount))
+
+			-- 	if IsControlPressed(0, 38) and timeHeld > 60 then
+			-- 		TriggerServerEvent('esx_ambulancejob:payFine')
+			-- 		RemoveItemsAfterRPDeath()
+			-- 		break
+			-- 	end
+			-- end
+			-- DoScreenFadeOut()
+
+			-- if IsControlPressed(0, 38) then
+			-- 	timeHeld = timeHeld + 1
+			-- else
+			-- 	timeHeld = 0
+			-- end
+
 			DrawGenericTextThisFrame()
 
-			BeginTextCommandDisplayText('STRING')
-			AddTextComponentSubstringPlayerName(text)
-			EndTextCommandDisplayText(0.5, 0.8)
-		end
+			SetTextEntry('STRING')
+			AddTextComponentString(text)
+			SetTextFont(0)
+			DrawText(0.5, 0.8)
 
-		if bleedoutTimer < 1 and isDead then
-			RemoveItemsAfterRPDeath()
+			if bleedoutTimer < 1 and isDead then
+				RemoveItemsAfterRPDeath()
+				DeathTimerIsRunning = false
+				isDead = false
+				-- DoScreenFadeIn()
+			end
 		end
 	end)
-end
-
-function GetClosestRespawnPoint()
-	local PlyCoords = GetEntityCoords(PlayerPedId())
-	local ClosestDist, ClosestHospital, ClosestCoord = 10000, {}, nil
-
-	for k,v in pairs(Config.RespawnPoints) do
-		local Distance = #(PlyCoords - vector3(v.coords.x, v.coords.y, v.coords.z))
-		if Distance <= ClosestDist then
-			ClosestDist = Distance
-			ClosestHospital = v
-			ClosestCoord = vector3(v.coords.x, v.coords.y, v.coords.z)
-		end
-	end
-
-	return ClosestCoord, ClosestHospital
 end
 
 function RemoveItemsAfterRPDeath()
 	TriggerServerEvent('esx_ambulancejob:setDeathStatus', false)
 
-	CreateThread(function()
-		ESX.TriggerServerCallback('esx_ambulancejob:removeItemsAfterRPDeath', function()
-			local RespawnCoords, ClosestHospital = GetClosestRespawnPoint()
-			
-			ESX.SetPlayerData('loadout', {})
+	Citizen.CreateThread(function()
+		DoScreenFadeOut(800)
 
-			DoScreenFadeOut(800)
-			RespawnPed(PlayerPedId(), RespawnCoords, ClosestHospital.heading)
-			while not IsScreenFadedOut() do
-			Wait(0)
-			end
-			AnimpostfxStop('DeathFailOut')
+		while not IsScreenFadedOut() do
+			Citizen.Wait(10)
+		end
+
+		ESX.TriggerServerCallback('esx_ambulancejob:removeItemsAfterRPDeath', function()
+			local formattedCoords = {
+				x = Config.RespawnPoint.coords.x,
+				y = Config.RespawnPoint.coords.y,
+				z = Config.RespawnPoint.coords.z
+			}
+
+			ESX.SetPlayerData('loadout', {})
+			RespawnPed(PlayerPedId(), formattedCoords, Config.RespawnPoint.heading)
+			SetEntityHealth(PlayerPedId(),115)
+
+			StopScreenEffect('DeathFailOut')
 			DoScreenFadeIn(800)
 		end)
 	end)
 end
 
 function RespawnPed(ped, coords, heading)
-	SetEntityCoordsNoOffset(ped, coords.x, coords.y, coords.z, false, false, false)
+	SetEntityCoordsNoOffset(ped, coords.x, coords.y, coords.z, false, false, false, true)
 	NetworkResurrectLocalPlayer(coords.x, coords.y, coords.z, heading, true, false)
 	SetPlayerInvincible(ped, false)
 	ClearPedBloodDamage(ped)
@@ -350,6 +492,7 @@ end)
 
 AddEventHandler('esx:onPlayerDeath', function(data)
 	OnPlayerDeath()
+
 end)
 
 RegisterNetEvent('esx_ambulancejob:revive')
@@ -361,7 +504,7 @@ AddEventHandler('esx_ambulancejob:revive', function()
 	DoScreenFadeOut(800)
 
 	while not IsScreenFadedOut() do
-		Wait(50)
+		Citizen.Wait(50)
 	end
 
 	local formattedCoords = {
@@ -371,9 +514,16 @@ AddEventHandler('esx_ambulancejob:revive', function()
 	}
 
 	RespawnPed(playerPed, formattedCoords, 0.0)
-
-	AnimpostfxStop('DeathFailOut')
+	SetEntityHealth(playerPed,115)
+	StopScreenEffect('DeathFailOut')
 	DoScreenFadeIn(800)
+	-- TriggerEvent('esx_status:getStatus', 'hunger', function(status)
+	-- 	TriggerEvent('esx_status:set', 'hunger', status + 100000)
+	-- end)
+
+	TriggerEvent('esx_status:getStatus', 'thirst', function(status)
+		TriggerEvent('esx_status:set', 'thirst', status + 100000)
+	end)
 end)
 
 -- Load unloaded IPLs

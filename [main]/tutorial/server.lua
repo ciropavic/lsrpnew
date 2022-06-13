@@ -26,7 +26,6 @@ AddEventHandler("tutorial:firstspawn",function ()
 end
 -- identifier = GetPlayerIdentifier(_source)
 -- identifier = identifier:gsub("%license:","")
-print(identifier)
     local firstSpawn = true
 
     MySQL.Async.fetchAll("SELECT * From users where identifier = @identifier ", {['@identifier'] = identifier},

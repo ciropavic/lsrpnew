@@ -23,12 +23,13 @@ AddEventHandler('ls_saveha:Client:SetPlayerHealthArmour', function(health, armou
     end)
 end)
 
-local TimeFreshCurrentArmour = 30000
+local TimeFreshCurrentArmour = 10000
 Citizen.CreateThread(function()
     while true do
         Citizen.Wait(0)
         
         if citizensave == true then
+            print("ddd")
             TriggerServerEvent('ls_saveha:Server:RefreshCurrent', GetEntityHealth(PlayerPedId()), GetPedArmour(PlayerPedId()))
             Citizen.Wait(TimeFreshCurrentArmour)
         end

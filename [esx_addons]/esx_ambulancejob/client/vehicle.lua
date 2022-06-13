@@ -5,7 +5,7 @@ function OpenVehicleSpawnerMenu(type, hospital, part, partNum)
 
 	ESX.UI.Menu.Open('default', GetCurrentResourceName(), 'vehicle', {
 		title    = _U('garage_title'),
-		align    = 'top-left',
+		align    = 'right',
 		elements = {
 			{label = _U('garage_storeditem'), action = 'garage'},
 			{label = _U('garage_storeitem'), action = 'store_garage'},
@@ -13,7 +13,7 @@ function OpenVehicleSpawnerMenu(type, hospital, part, partNum)
 	}}, function(data, menu)
 		if data.current.action == 'buy_vehicle' then
 			local shopElements = {}
-			local authorizedVehicles = Config.AuthorizedVehicles[type][ESX.PlayerData.job.grade_name] 	
+			local authorizedVehicles = Config.AuthorizedVehicles[type][ESX.PlayerData.job.grade_name]
 			local shopCoords = Config.Hospitals[hospital][part][partNum].InsideShop
 
 			if #authorizedVehicles > 0 then
@@ -39,7 +39,7 @@ function OpenVehicleSpawnerMenu(type, hospital, part, partNum)
 		elseif data.current.action == 'garage' then
 			local garage = {}
 
-			ESX.TriggerServerCallback('esx_vehicleshop:retrieveJobVehicles', function(jobVehicles)
+			ESX.TriggerServerCallback('esx_ambulancejob:retrieveJobVehicles', function(jobVehicles)
 				if #jobVehicles > 0 then
 					local allVehicleProps = {}
 
@@ -50,7 +50,7 @@ function OpenVehicleSpawnerMenu(type, hospital, part, partNum)
 							local vehicleName = GetLabelText(GetDisplayNameFromVehicleModel(props.model))
 							local label = ('%s - <span style="color:darkgoldenrod;">%s</span>: '):format(vehicleName, props.plate)
 
-							if v.stored then
+							if v.stored == 1 then
 								label = label .. ('<span style="color:green;">%s</span>'):format(_U('garage_stored'))
 							else
 								label = label .. ('<span style="color:darkred;">%s</span>'):format(_U('garage_notstored'))
@@ -70,7 +70,7 @@ function OpenVehicleSpawnerMenu(type, hospital, part, partNum)
 					if #garage > 0 then
 						ESX.UI.Menu.Open('default', GetCurrentResourceName(), 'vehicle_garage', {
 							title    = _U('garage_title'),
-							align    = 'top-left',
+							align    = 'right',
 							elements = garage
 						}, function(data2, menu2)
 							if data2.current.stored then
@@ -109,17 +109,17 @@ function OpenVehicleSpawnerMenu(type, hospital, part, partNum)
 end
 
 function StoreNearbyVehicle(playerCoords)
-	local vehicles, plates, index = ESX.Game.GetVehiclesInArea(playerCoords, 30.0), {}, {}
+	local vehicles, vehiclePlates = ESX.Game.GetVehiclesInArea(playerCoords, 30.0), {}
 
-	if next(vehicles) then
-		for i = 1, #vehicles do
-			local vehicle = vehicles[i]
-			
+	if #vehicles > 0 then
+		for k,v in ipairs(vehicles) do
+
 			-- Make sure the vehicle we're saving is empty, or else it wont be deleted
-			if GetVehicleNumberOfPassengers(vehicle) == 0 and IsVehicleSeatFree(vehicle, -1) then
-				local plate = ESX.Math.Trim(GetVehicleNumberPlateText(vehicle))
-				plates[#plates + 1] = plate
-				index[plate] = vehicle
+			if GetVehicleNumberOfPassengers(v) == 0 and IsVehicleSeatFree(v, -1) then
+				table.insert(vehiclePlates, {
+					vehicle = v,
+					plate = ESX.Math.Trim(GetVehicleNumberPlateText(v))
+				})
 			end
 		end
 	else
@@ -127,28 +127,23 @@ function StoreNearbyVehicle(playerCoords)
 		return
 	end
 
-	ESX.TriggerServerCallback('esx_ambulancejob:storeNearbyVehicle', function(plate)
-		if plate then
-			local vehicleId = index[plate]
+	ESX.TriggerServerCallback('esx_ambulancejob:storeNearbyVehicle', function(storeSuccess, foundNum)
+		if storeSuccess then
+			local vehicleId = vehiclePlates[foundNum]
 			local attempts = 0
-			ESX.Game.DeleteVehicle(vehicleId)
+			ESX.Game.DeleteVehicle(vehicleId.vehicle)
 			isBusy = true
 
-			CreateThread(function()
-				BeginTextCommandBusyspinnerOn('STRING')
-				AddTextComponentSubstringPlayerName(_U('garage_storing'))
-				EndTextCommandBusyspinnerOn(4)
-
+			Citizen.CreateThread(function()
 				while isBusy do
-					Wait(100)
+					Citizen.Wait(0)
+					drawLoadingText(_U('garage_storing'), 255, 255, 255, 255)
 				end
-
-				BusyspinnerOff()
 			end)
 
 			-- Workaround for vehicle not deleting when other players are near it.
-			while DoesEntityExist(vehicleId) do
-				Wait(500)
+			while DoesEntityExist(vehicleId.vehicle) do
+				Citizen.Wait(500)
 				attempts = attempts + 1
 
 				-- Give up
@@ -158,10 +153,9 @@ function StoreNearbyVehicle(playerCoords)
 
 				vehicles = ESX.Game.GetVehiclesInArea(playerCoords, 30.0)
 				if #vehicles > 0 then
-					for i = 1, #vehicles do
-						local vehicle = vehicles[i]
-						if ESX.Math.Trim(GetVehicleNumberPlateText(vehicle)) == plate then
-							ESX.Game.DeleteVehicle(vehicle)
+					for k,v in ipairs(vehicles) do
+						if ESX.Math.Trim(GetVehicleNumberPlateText(v)) == vehicleId.plate then
+							ESX.Game.DeleteVehicle(v)
 							break
 						end
 					end
@@ -173,7 +167,7 @@ function StoreNearbyVehicle(playerCoords)
 		else
 			ESX.ShowNotification(_U('garage_has_notstored'))
 		end
-	end, plates)
+	end, vehiclePlates)
 end
 
 function GetAvailableVehicleSpawnPoint(hospital, part, partNum)
@@ -201,12 +195,12 @@ function OpenShopMenu(elements, restoreCoords, shopCoords)
 
 	ESX.UI.Menu.Open('default', GetCurrentResourceName(), 'vehicle_shop', {
 		title    = _U('vehicleshop_title'),
-		align    = 'top-left',
+		align    = 'right',
 		elements = elements
 	}, function(data, menu)
 		ESX.UI.Menu.Open('default', GetCurrentResourceName(), 'vehicle_shop_confirm', {
 			title    = _U('vehicleshop_confirm', data.current.name, data.current.price),
-			align    = 'top-left',
+			align    = 'right',
 			elements = {
 				{label = _U('confirm_no'), value = 'no'},
 				{label = _U('confirm_yes'), value = 'yes'}
@@ -218,6 +212,7 @@ function OpenShopMenu(elements, restoreCoords, shopCoords)
 				props.plate    = newPlate
 
 				ESX.TriggerServerCallback('esx_ambulancejob:buyJobVehicle', function(bought)
+					print(bought)
 					if bought then
 						ESX.ShowNotification(_U('vehicleshop_bought', data.current.name, ESX.Math.GroupDigits(data.current.price)))
 
@@ -278,16 +273,16 @@ function OpenShopMenu(elements, restoreCoords, shopCoords)
 	end)
 end
 
-CreateThread(function()
+Citizen.CreateThread(function()
 	while true do
-		sleep = 1500
+		Citizen.Wait(0)
 
 		if isInShopMenu then
-			sleep = 0
 			DisableControlAction(0, 75, true)  -- Disable exit vehicle
 			DisableControlAction(27, 75, true) -- Disable exit vehicle
+		else
+			Citizen.Wait(500)
 		end
-		Wait(sleep)
 	end
 end)
 
@@ -310,7 +305,7 @@ function WaitForVehicleToLoad(modelHash)
 		EndTextCommandBusyspinnerOn(4)
 
 		while not HasModelLoaded(modelHash) do
-			Wait(0)
+			Citizen.Wait(0)
 			DisableAllControlActions(0)
 		end
 

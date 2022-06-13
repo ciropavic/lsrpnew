@@ -188,7 +188,7 @@ Config.market_types = {
 			},
 		},
 		['market_items'] = {
-			['WEAPON_KNIFE_PACKAGE'] = {
+			['WEAPON_KNIFE'] = {
 				['name'] = "나이프",
 				['price_to_customer'] = 2000,
 				['price_to_owner'] = 1000,

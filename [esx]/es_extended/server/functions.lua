@@ -164,7 +164,9 @@ function ESX.TriggerServerCallback(name, requestId, source, cb, ...)
 end
 
 function Core.SavePlayer(xPlayer, cb)
+	print(xPlayer)
 	MySQL.prepare('UPDATE `users` SET `accounts` = ?, `job` = ?, `job_grade` = ?, `group` = ?, `position` = ?, `inventory` = ?, `loadout` = ? WHERE `identifier` = ?', {
+
 		json.encode(xPlayer.getAccounts(true)),
 		xPlayer.job.name,
 		xPlayer.job.grade,

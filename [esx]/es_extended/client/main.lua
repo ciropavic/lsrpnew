@@ -55,6 +55,7 @@ AddEventHandler('esx:playerLoaded', function(xPlayer, isNew, skin)
 			ShutdownLoadingScreen()
 			ShutdownLoadingScreenNui()
 			FreezeEntityPosition(ESX.PlayerData.ped, false)
+			TriggerServerEvent("ls_saveha:loadingscreenoff")
 		end)
 	end
 

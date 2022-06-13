@@ -354,7 +354,7 @@ AddEventHandler('kuana:checkvehi', function(plate)
 end)
 
 RegisterServerEvent('garagem:apre')
-AddEventHandler('garagem:apre', function(plate, x, y, z, headings, health)
+AddEventHandler('garagem:apre', function(plate, x, y, z, headings, engineHealths,bodyHeatlh,fuel)
 	local _source = source
 	local xPlayer = ESX.GetPlayerFromId(_source)
 	local h = headings
@@ -362,7 +362,9 @@ AddEventHandler('garagem:apre', function(plate, x, y, z, headings, health)
 			MySQL.Sync.execute("UPDATE owned_vehicles SET y =@y WHERE plate=@plate",{['@y'] = y , ['@plate'] = plate})
 			MySQL.Sync.execute("UPDATE owned_vehicles SET z =@z WHERE plate=@plate",{['@z'] = z , ['@plate'] = plate})
 			MySQL.Sync.execute("UPDATE owned_vehicles SET h =@h WHERE plate=@plate",{['@h'] = h , ['@plate'] = plate})
-			MySQL.Sync.execute("UPDATE owned_vehicles SET health =@he WHERE plate=@plate",{['@he'] = health , ['@plate'] = plate})
+			MySQL.Sync.execute("UPDATE owned_vehicles SET engineHealths =@he WHERE plate=@plate",{['@he'] = engineHealths , ['@plate'] = plate})
+			MySQL.Sync.execute("UPDATE owned_vehicles SET bodyHeatlh =@he WHERE plate=@plate",{['@he'] = bodyHeatlh , ['@plate'] = plate})
+			MySQL.Sync.execute("UPDATE owned_vehicles SET fuel =@he WHERE plate=@plate",{['@he'] = fuel , ['@plate'] = plate})
 			-- MySQL.Sync.execute("UPDATE owned_vehicles SET vehicle =@vehicle WHERE plate=@plate",{['@vehicle'] = json.encode(plate) , ['@plate'] = plate})
 			
 

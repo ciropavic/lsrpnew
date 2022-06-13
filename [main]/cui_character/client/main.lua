@@ -71,6 +71,7 @@ function PreparePlayer()
         DoScreenFadeIn(500)
         SetPedMaxHealth(GetPlayerPed(-1),200)
         TriggerServerEvent("ls_saveha:loadingscreenoff")
+        
     end
 
     isPlayerReady = true
