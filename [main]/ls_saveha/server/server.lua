@@ -30,7 +30,6 @@ RegisterServerEvent('ls_saveha:Server:RefreshCurrent')
 AddEventHandler('ls_saveha:Server:RefreshCurrent', function(updateHealth, updateArmour)
     local src = source
     local xPlayer = ESX.GetPlayerFromId(src)
-    print(updateHealth)
     MySQL.Async.execute("UPDATE users SET armour = @armour, health = @health WHERE identifier = @identifier", { 
         ['@identifier'] = xPlayer.getIdentifier(),
         ['@armour'] = tonumber(updateArmour),

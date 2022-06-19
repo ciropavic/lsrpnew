@@ -21,6 +21,7 @@ AddEventHandler('onResourceStart', function(resourceName)
 		local result2 = MySQL.query.await('SELECT * FROM job_grades')
 
 		for i = 1, #result2, 1 do
+
 			Jobs[result2[i].job_name].grades[tostring(result2[i].grade)] = result2[i]
 		end
 	end

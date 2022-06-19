@@ -1,4 +1,4 @@
-USE `es_extended`;
+USE `essentialmode`;
 
 INSERT INTO `addon_account` (name, label, shared) VALUES
 	('society_police','Polizei',1)
@@ -19,20 +19,20 @@ INSERT INTO `jobs` (name, label) VALUES
 INSERT INTO `job_grades` (job_name, grade, name, label, salary, skin_male, skin_female) VALUES
 	('police',0,'recruit','Rekrut',20,'{}','{}'),
 	('police',1,'officer','Officier',40,'{}','{}'),
-	('police',2,'sergeant','Sergent',60,'{}','{}'),
-	('police',3,'lieutenant','Lieutenant',85,'{}','{}'),
-	('police',4,'boss','Commandant',100,'{}','{}')
+	('police',2,'sergeant','Sergent',40,'{}','{}'),
+	('police',3,'lieutenant','Lieutenant',65,'{}','{}'),
+	('police',4,'boss','Commandant',80,'{}','{}')
 ;
 
 CREATE TABLE `fine_types` (
-	`id` int NOT NULL AUTO_INCREMENT,
+
+	`id` int(11) NOT NULL AUTO_INCREMENT,
 	`label` varchar(255) DEFAULT NULL,
-	`amount` int DEFAULT NULL,
-	`category` int DEFAULT NULL,
+	`amount` int(11) DEFAULT NULL,
+	`category` int(11) DEFAULT NULL,
 
 	PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
+);
 
 INSERT INTO `fine_types` VALUES ('1', 'Missbrauchen der Hupe', '30', '0');
 INSERT INTO `fine_types` VALUES ('2', 'Vorfahrtstraße missachtet', '40', '0');

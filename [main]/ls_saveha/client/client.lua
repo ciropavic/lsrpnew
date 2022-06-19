@@ -16,7 +16,6 @@ AddEventHandler('ls_saveha:Client:SetPlayerHealthArmour', function(health, armou
     
     SetPedMaxHealth(PlayerPedId(), 200)
     ESX.SetTimeout(5000, function()
-        print(health)
         SetEntityHealth(PlayerPedId(), tonumber(health))
         SetPedArmour(PlayerPedId(), tonumber(armour))
         citizensave = true
